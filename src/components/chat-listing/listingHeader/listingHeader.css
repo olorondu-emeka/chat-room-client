@@ -1,0 +1,24 @@
+.listing-header {
+  padding: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--header-color);
+}
+
+.listing-header__button-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 40%;
+}
+
+.listing-header__title {
+  font-size: 1.8rem;
+}
+
+.listing-header__button {
+  font-size: 1.3rem;
+  padding: 1rem 0.7rem;
+  text-align: center;
+}
