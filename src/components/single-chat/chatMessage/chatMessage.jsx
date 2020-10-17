@@ -1,14 +1,24 @@
 import React from "react"
-import ChatBody from "../main/chatBody"
 
-const ChatMessage = ({ type, message, username }) => {
-  const messageClass =
-    type === "sender" ? "chat-message__content--blue" : "chat-message__content--white"
-  const finalClass = `chat-message__content ${messageClass}`
+import "./chatMessage.css"
+
+const ChatMessage = ({ type, message, username, timestamp, context }) => {
+  const messageClass = type === "sender" ? "chat-message--sender" : "chat-message--recipient"
+  const finalClass = `chat-message ${messageClass}`
+  const positionClass = type === "sender" ? "flex-right" : "flex-left"
+  const finalWrapperClass = `chat-message__wrapper ${positionClass}`
+  const colorArray = ["blue", "green", "purple", "pink"]
+  const randomIndex = Math.floor(Math.random() * colorArray.length)
+
   return (
-    <div className="chat-message">
-      {type === "recipient" && <h3>{username}</h3>}
-      <p className={finalClass}>{message}</p>
+    <div className={finalWrapperClass}>
+      <div className={finalClass}>
+        {type === "recipient" && context === "chatroom" && (
+          <h3 className={`chat-message__username ${colorArray[randomIndex]}`}>{username}</h3>
+        )}
+        <p className="chat-message__content">{message}</p>
+        <span className="timestamp">{timestamp}</span>
+      </div>
     </div>
   )
 }

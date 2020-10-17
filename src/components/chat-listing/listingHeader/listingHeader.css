@@ -1,10 +1,12 @@
 .listing-header {
-  padding: 1.2rem;
+  padding: 1.2rem 1.4rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: var(--header-color);
+  /* background: #a7a6f7; */
   position: fixed;
+  top: 0;
   width: 30%;
   z-index: 50;
 }
@@ -13,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 40%;
+  width: 45%;
 }
 
 .listing-header__title {
@@ -21,7 +23,12 @@
 }
 
 .listing-header__button {
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   padding: 0.7rem 0.7rem;
   text-align: center;
+}
+
+.listing-header__button:hover {
+  color: #605ef7;
+  font-weight: 600;
 }

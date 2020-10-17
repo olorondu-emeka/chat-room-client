@@ -1,6 +1,6 @@
 import React from "react"
 
-import ListingHeader from "../listingHeader/listingHeader"
+import ListingHeader from "../listingHeader/listingHeader.jsx"
 import ListingBody from "../listingBody/listingBody"
 
 import "./chatListing.css"
