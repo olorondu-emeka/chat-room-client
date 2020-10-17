@@ -1,0 +1,22 @@
+.chat-block {
+  border-bottom: 1px solid #ccc;
+  padding: 1rem 0rem;
+}
+
+.chat-block__header {
+  font-size: 1.7rem;
+  color: #111;
+}
+
+.chat-block__content {
+  font-size: 1.5rem;
+  color: #777;
+}
+
+.chat-block:last-child {
+  border-bottom: none;
+}
+
+.chat-block:hover {
+  cursor: pointer;
+}

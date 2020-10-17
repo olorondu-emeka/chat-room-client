@@ -4,6 +4,9 @@
   align-items: center;
   justify-content: space-between;
   background: var(--header-color);
+  position: fixed;
+  width: 30%;
+  z-index: 50;
 }
 
 .listing-header__button-group {
@@ -19,6 +22,6 @@
 
 .listing-header__button {
   font-size: 1.3rem;
-  padding: 1rem 0.7rem;
+  padding: 0.7rem 0.7rem;
   text-align: center;
 }
