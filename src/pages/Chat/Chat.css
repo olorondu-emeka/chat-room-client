@@ -1,0 +1,6 @@
+.chat {
+  display: flex;
+  position: relative;
+  height: 100vh;
+  max-height: 100vh;
+}

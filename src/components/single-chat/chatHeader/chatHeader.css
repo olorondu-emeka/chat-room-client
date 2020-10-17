@@ -1,0 +1,18 @@
+.chat-header {
+  padding: 1.2rem 1.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  /* background: var(--header-color); */
+  position: fixed;
+  top: 0;
+  width: 70%;
+  z-index: 50;
+  /* border-left: 1px solid #aeafaf; */
+  height: 5.7rem;
+}
+
+.chat-header__title {
+  font-size: 1.8rem;
+}

@@ -1,0 +1,5 @@
+.chat-listing {
+  position: relative;
+  width: 30%;
+  overflow-y: scroll;
+}
