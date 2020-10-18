@@ -11,7 +11,7 @@
   box-shadow: 2px 2px 3px rgba(196, 196, 196, 0.67);
 }
 
-h3 {
+.main h3 {
   margin: 0px;
   font-size: 1.77rem !important;
   font-weight: bold !important;
@@ -28,7 +28,7 @@ h3 {
   width: 36.65%;
 }
 
-form {
+.main form {
   width: 81.4%;
   margin: 0px auto;
   padding: 30px 0px;
@@ -58,7 +58,7 @@ form {
 
 .input_group input[type="text"],
 .input_group input[type="password"],
-button {
+.main button {
   width: 95.53%;
   padding: 8px;
   border: 1px solid #d3d4d6;
