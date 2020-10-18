@@ -1,20 +1,20 @@
-import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import React from "react"
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom"
 
-import Chat from './pages/Chat/Chat';
+import Chat from "./pages/Chat/Chat"
+import LandingPage from "./pages/general/landingPage/landingPage"
 
-import './App.css';
+import "./App.css"
 
 const App = () => {
   return (
     <BrowserRouter>
       <Switch>
-        <Route path="/register" render={() => <p>Hello</p>} />
         <Route path="/chat" component={Chat} />
-        <Redirect to="/register"/>
+        <Route path="/" component={LandingPage} />
       </Switch>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App
