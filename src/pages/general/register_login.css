@@ -1,0 +1,96 @@
+.main {
+  display: block;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: #f2f2f2;
+  font-size: 1.6rem;
+}
+
+.form_container {
+  background: #ffffff;
+  box-shadow: 2px 2px 3px rgba(196, 196, 196, 0.67);
+}
+
+h3 {
+  margin: 0px;
+  font-size: 1.77rem !important;
+  font-weight: bold !important;
+}
+
+.form_container header {
+  padding: 15px 45px 15px;
+  border-bottom: 1px solid #e1e2e4;
+}
+
+#login_main {
+  margin: 10% auto;
+  align-items: center;
+  width: 36.65%;
+}
+
+form {
+  width: 81.4%;
+  margin: 0px auto;
+  padding: 30px 0px;
+}
+
+.input_group {
+  margin-bottom: 25px;
+}
+
+.input_group label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.input_group input[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px 0px;
+  color: #ffffff;
+  background: rgba(67, 223, 101, 0.55);
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1.66rem;
+  cursor: pointer;
+}
+
+.input_group input[type="text"],
+.input_group input[type="password"],
+button {
+  width: 95.53%;
+  padding: 8px;
+  border: 1px solid #d3d4d6;
+  border-radius: 3px;
+  font-size: 1.6rem;
+  font-family: "Roboto", sans-serif;
+}
+
+.alt_text {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.alt_text span a {
+  font-weight: bold;
+  color: #43df65;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.input_group span:first-of-type {
+  margin-right: 5px;
+}
+
+hr {
+  border: 1px solid #e1e2e4;
+  opacity: 0.6;
+  margin: 42px 0px 30px;
+}
+
+.password_reset {
+  cursor: pointer;
+  color: #5383ff;
+  font-weight: 600;
+}
