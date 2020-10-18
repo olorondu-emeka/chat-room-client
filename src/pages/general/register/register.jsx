@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
+import { Spinner } from "@chakra-ui/core"
+import axios from "../../../http"
 
 import "../register_login.css"
 
@@ -8,11 +10,21 @@ const resetScroll = () => {
 }
 
 const Register = (props) => {
+  useEffect(() => {
+    resetScroll()
+  }, [])
+
+  const history = useHistory()
+
   const initialState = {
     username: "",
     password: "",
   }
+
   const [formState, setFormState] = useState(initialState)
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [statusCode, setStatusCode] = useState(null)
 
   const textChangeHandler = (event) => {
     const theName = event.target.name
@@ -26,15 +38,29 @@ const Register = (props) => {
     })
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setLoading(true)
     resetScroll()
+    try {
+      const response = await axios.post("/user", formState)
+      setLoading(false)
+      setErrorMessage("")
+      localStorage.setItem("user", JSON.stringify(response))
+      localStorage.setItem("token", response.token)
+      response.id && history.push("/chat")
+    } catch (error) {
+      const errorMessage = error.response.data.message ? error.response.data.message : "error"
+      setErrorMessage(errorMessage)
+      setStatusCode(error.response.status)
+      setLoading(false)
+    }
   }
 
   return (
     <div className="main">
       <main id="login_main">
-        {/* {loading ? <Spinner/> : <p>{formState.theMessage}</p>} */}
+        {loading ? <Spinner /> : <p>{errorMessage}</p>}
         <div className="form_container">
           <header>
             <h3>Register</h3>
