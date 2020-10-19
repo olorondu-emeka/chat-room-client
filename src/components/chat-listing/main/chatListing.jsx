@@ -5,11 +5,11 @@ import ListingBody from "../listingBody/listingBody"
 
 import "./chatListing.css"
 
-const ChatListing = (props) => {
+const ChatListing = ({ chatrooms, handleClick }) => {
   return (
     <section className="chat-listing">
       <ListingHeader />
-      <ListingBody />
+      <ListingBody chatrooms={chatrooms} handleClick={handleClick} />
     </section>
   )
 }

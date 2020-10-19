@@ -16,3 +16,13 @@
 .chat-header__title {
   font-size: 1.8rem;
 }
+
+.chat-header__button {
+  font-size: 1.4rem;
+}
+
+.chat-header__button:hover {
+  color: #605ef7;
+  font-weight: 600;
+  cursor: pointer;
+}
