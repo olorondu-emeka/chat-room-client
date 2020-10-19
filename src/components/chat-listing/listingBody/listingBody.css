@@ -2,3 +2,11 @@
   padding: 0rem 1.4rem;
   margin-top: 5.9rem;
 }
+
+.empty-body-listing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  height: 64vh;
+}
