@@ -7,16 +7,20 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/core"
 
-const MyModal = ({ isOpen, onClose, modalTitle, modalContent }) => {
+import "./modal.css"
+
+const MyModal = ({ isOpen, modalTitle, modalContent, closeOnOverlayClick }) => {
+  const { onOpen, onClose } = useDisclosure()
   return (
-    <>
-      <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <div className="my-modal">
+      <Modal preserveScrollBarGap isOpen={isOpen} size="xl" onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>{modalTitle}</ModalHeader>
-          <ModalCloseButton />
+          {/* <ModalCloseButton /> */}
           <ModalBody>{modalContent}</ModalBody>
 
           {/* <ModalFooter>
@@ -27,7 +31,7 @@ const MyModal = ({ isOpen, onClose, modalTitle, modalContent }) => {
           </ModalFooter> */}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   )
 }
 

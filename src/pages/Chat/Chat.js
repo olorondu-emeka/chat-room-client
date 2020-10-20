@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react"
-import { useHistory } from "react-router-dom"
-import { Spinner } from "@chakra-ui/core"
+import { useHistory, Redirect } from "react-router-dom"
+import { Spinner, Stack } from "@chakra-ui/core"
 import axios from "../../http"
 import Modal from "../../components/UI/modal/modal"
-import { Stack, Input, Button } from "@chakra-ui/core"
 
 import ChatListing from "../../components/chat-listing/main/chatListing.jsx"
 import ChatBody from "../../components/single-chat/main/chatBody.jsx"
@@ -35,9 +34,12 @@ const Chat = (props) => {
   const [addMembersModal, setAddMembersModal] = useState(false)
   const [formState, setFormState] = useState(initialState)
   const [allMembers, setAllMembers] = useState([])
-  const [selectedMembers, setSelectedMembers] = useState([])
+  const [selectedMembers, setSelectedMembers] = useState({})
   const [createGroupLoading, setCreateGroupLoading] = useState(false)
   const [addMembersLoading, setAddMembersLoading] = useState(false)
+  const [selectedMembersNo, setSelectedMembersNo] = useState(0)
+  const [createGroupModalOverlay, setCreateGroupModalOverlay] = useState(true)
+  const [addMembersModalOverlay, setAddMembersModalOverlay] = useState(true)
 
   const user = JSON.parse(localStorage.getItem("user"))
 
@@ -81,7 +83,28 @@ const Chat = (props) => {
     await fetchChatMessages(chatroom.id)
   }
 
+  const closeOnOverlayClick = (modalState, setModalState) => {
+    console.log("overlay clicked!")
+    if (modalState) {
+      return false
+    }
+
+    setModalState(false)
+    return true
+  }
+
+  const handleCreateGroupModalOverlay = () => {
+    const modalState = closeOnOverlayClick(createGroupLoading, setCreateGroupModal)
+    setCreateGroupModalOverlay(modalState)
+  }
+
+  const handleAddMembersModalOverlay = () => {
+    const modalState = closeOnOverlayClick(addMembersLoading, setAddMembersModal)
+    setAddMembersModalOverlay(modalState)
+  }
+
   const triggerAddMembers = () => {
+    console.log("add members triggered", addMembersModal)
     setAddMembersModal((prevState) => !prevState)
   }
 
@@ -117,6 +140,14 @@ const Chat = (props) => {
     event.preventDefault()
     setCreateGroupLoading(true)
     try {
+      const response = await axios.post("/chatroom", formState)
+      setChatrooms((prevState) => {
+        let chatrooms = [...prevState]
+        chatrooms.push(response)
+        return [...chatrooms]
+      })
+      setCreateGroupLoading(false)
+      setCreateGroupModal(false)
     } catch (error) {
       setCreateGroupLoading(false)
       console.log(error)
@@ -127,9 +158,13 @@ const Chat = (props) => {
     event.preventDefault()
     setAddMembersLoading(true)
     try {
+      const membersArray = []
+      for (let key in selectedMembers) {
+        membersArray.push(parseInt(key))
+      }
       const requestBody = {
         chatroomId: current.id,
-        membersArray: [...selectedMembers], // an array of all ids of selected members
+        memberIdArray: membersArray, // an array of all ids of selected members
       }
       const response = await axios.post("/chatroom/add-members", requestBody)
       setAllMembers([])
@@ -141,6 +176,7 @@ const Chat = (props) => {
   }
 
   const getAllMembers = async () => {
+    console.log("get all members o")
     if (addMembersModal) {
       try {
         setAddMembersLoading(true)
@@ -154,22 +190,48 @@ const Chat = (props) => {
         setAllMembers((prevState) => {
           return [...prevState, ...membersArray]
         })
+        setAddMembersLoading(false)
       } catch (error) {
+        console.log("get all members loading")
         setAddMembersLoading(false)
       }
     }
   }
 
-  const handleMemberSelect = (id) => {
+  const handleMemberSelect = (event) => {
+    console.log(event.target.value, event.target.checked)
+    const checked = event.target.checked
+    const value = event.target.value
+
     setSelectedMembers((prevState) => {
-      let previousSelectedMembers = [...prevState]
-      previousSelectedMembers.push(id)
-      return [...previousSelectedMembers]
+      let previousSelectedMembers = { ...prevState }
+      if (checked && !previousSelectedMembers[value]) {
+        previousSelectedMembers[value] = value
+      }
+
+      if (!checked && previousSelectedMembers[value]) {
+        delete previousSelectedMembers[value]
+      }
+
+      return { ...previousSelectedMembers }
     })
   }
 
+  useEffect(() => {
+    const selectedMembersCount = Object.keys(selectedMembers)
+    setSelectedMembersNo(selectedMembersCount.length)
+  }, [selectedMembers])
+
+  useEffect(() => {
+    handleCreateGroupModalOverlay()
+  }, [createGroupLoading])
+
+  useEffect(() => {
+    handleAddMembersModalOverlay()
+  }, [addMembersLoading])
+
   const createGroupContent = (
-    <form onSubmit={handleCreateGroup}>
+    <form onSubmit={handleCreateGroup} className="general-form">
       {createGroupLoading && (
         <div className="spinner">
           <Spinner size="xl" color="blue.500" />
@@ -177,21 +239,23 @@ const Chat = (props) => {
       )}
       {!createGroupLoading && (
         <Stack spacing={3}>
-          <Input type="text" placeholder="Name" name="name" onChange={textChangeHandler} />
-          <Input
+          <input type="text" placeholder="Name" name="name" onChange={textChangeHandler} required />
+          <input
             type="text"
             placeholder="Description"
             name="description"
             onChange={textChangeHandler}
+            size="lg"
+            required
           />
-          <Input type="submit" value="Submit" />
+          <input type="submit" value="Submit" />
         </Stack>
       )}
     </form>
   )
 
   const addMembersContent = (
-    <form onSubmit={handleAddMembers}>
+    <form onSubmit={handleAddMembers} className="general-form">
       {addMembersLoading && (
         <div className="spinner">
           <Spinner size="xl" color="blue.500" />
@@ -200,23 +264,40 @@ const Chat = (props) => {
       {!addMembersLoading && (
         <Stack spacing={3}>
           {allMembers.map((member) => (
-            <Input
-              type="checkbox"
-              onClick={() => handleMemberSelect(member.id)}
-              name={member.username}
-            />
+            <div className="checkbox-group">
+              <input
+                type="checkbox"
+                onChange={handleMemberSelect}
+                name={`box_${member.username}`}
+                variantColor="red"
+                size="lg"
+                value={member.id}
+              />
+              <label for={`box_${member.username}`}>{member.username}</label>
+            </div>
           ))}
         </Stack>
       )}
+      {!addMembersLoading && allMembers.length > 0 && (
+        <input
+          className={selectedMembersNo === 0 && "disabled"}
+          type="submit"
+          value="Submit"
+          disabled={selectedMembersNo === 0}
+        />
+      )}
+      {!addMembersLoading && allMembers.length === 0 && <p>No new members to add</p>}
     </form>
   )
 
-  useState(async () => {
-    await getAllMembers()
+  useEffect(() => {
+    console.log("get all members use effect hook")
+    getAllMembers()
   }, [addMembersModal])
 
   return (
     <section className="chat">
+      {!user && <Redirect to="/login" />}
       {loading && (
         <div className="spinner">
           <Spinner size="xl" color="blue.500" />
@@ -236,6 +317,7 @@ const Chat = (props) => {
           loading={chatroomMessagesLoading}
           isAdmin={current.adminId === user.id}
           chatroomTitle={current.name}
+          triggerAddMembers={triggerAddMembers}
         />
       )}
       {!loading && current.id === undefined && (
@@ -245,15 +327,15 @@ const Chat = (props) => {
       )}
       <Modal
         isOpen={createGroupModal}
-        onClose={setCreateGroupModal}
         modalTitle="Create Chatroom"
         modalContent={createGroupContent}
+        closeOnOverlayClick={createGroupModalOverlay}
       />
       <Modal
         isOpen={addMembersModal}
-        onClose={setAddMembersModal}
         modalTitle="Add Members"
         modalContent={addMembersContent}
+        closeOnOverlayClick={addMembersModalOverlay}
       />
     </section>
   )

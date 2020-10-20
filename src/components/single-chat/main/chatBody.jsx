@@ -5,7 +5,7 @@ import ChatHeader from "../chatHeader/chatHeader"
 import "./chatBody.css"
 import { Spinner } from "@chakra-ui/core"
 
-const ChatBody = ({ messages, isAdmin, loading, chatroomTitle }) => {
+const ChatBody = ({ messages, isAdmin, loading, chatroomTitle, triggerAddMembers }) => {
   return (
     <section className="chat-body">
       {loading && (
@@ -13,7 +13,14 @@ const ChatBody = ({ messages, isAdmin, loading, chatroomTitle }) => {
           <Spinner size="xl" color="blue.500" />
         </div>
       )}
-      {!loading && <ChatHeader title={chatroomTitle} context="chatroom" isAdmin={isAdmin} />}
+      {!loading && (
+        <ChatHeader
+          title={chatroomTitle}
+          context="chatroom"
+          isAdmin={isAdmin}
+          buttonClick={triggerAddMembers}
+        />
+      )}
       {!loading && messages.length === 0 && (
         <div className="empty-body-chat">
           <p>No new Messages</p>
