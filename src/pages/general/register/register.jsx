@@ -77,8 +77,6 @@ const Register = (props) => {
             <div className="input_group">
               <input type="submit" name="register" value="Register" />
             </div>
-            {/* <hr />
-                            <p className="password_reset">Forgot Password?</p> */}
           </form>
         </div>
         <p className="alt_text">

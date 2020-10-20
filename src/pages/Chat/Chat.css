@@ -22,3 +22,47 @@
   height: 100vh;
   max-height: 100vh;
 }
+
+.general-form input[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 1rem 0px;
+  color: #ffffff;
+  background: rgba(67, 223, 101, 0.55);
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1.66rem;
+  cursor: pointer;
+}
+
+.general-form input[type="text"] {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #d3d4d6;
+  border-radius: 3px;
+  font-size: 1.6rem;
+  font-family: "Roboto", sans-serif;
+  margin-bottom: 2rem;
+}
+
+.general-form p {
+  font-size: 1.6rem;
+}
+
+.disabled {
+  opacity: 0.5;
+}
+
+.disabled:hover {
+  cursor: not-allowed;
+}
+
+.checkbox-group {
+  margin-bottom: 1.2rem;
+}
+
+.checkbox-group label {
+  font-size: 1.4rem;
+  margin-left: 1.5rem;
+}

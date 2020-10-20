@@ -44,6 +44,7 @@ const Login = (props) => {
     resetScroll()
     try {
       const response = await axios.post("/session/create", formState)
+      console.log(response)
       setLoading(false)
       setErrorMessage("")
       localStorage.setItem("user", JSON.stringify(response))

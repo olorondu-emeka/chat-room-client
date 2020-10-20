@@ -5,10 +5,10 @@ import ListingBody from "../listingBody/listingBody"
 
 import "./chatListing.css"
 
-const ChatListing = ({ chatrooms, handleClick }) => {
+const ChatListing = ({ chatrooms, handleClick, triggerCreateModal, handleLogout }) => {
   return (
     <section className="chat-listing">
-      <ListingHeader />
+      <ListingHeader triggerCreateModal={triggerCreateModal} handleLogout={handleLogout} />
       <ListingBody chatrooms={chatrooms} handleClick={handleClick} />
     </section>
   )
