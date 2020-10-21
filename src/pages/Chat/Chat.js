@@ -3,6 +3,7 @@ import { useHistory, Redirect } from "react-router-dom"
 import { Spinner, Stack } from "@chakra-ui/core"
 import axios from "../../http"
 import Modal from "../../components/UI/modal/modal"
+import openSocket from "socket.io-client"
 
 import ChatListing from "../../components/chat-listing/main/chatListing.jsx"
 import ChatBody from "../../components/single-chat/main/chatBody.jsx"
@@ -42,6 +43,10 @@ const Chat = (props) => {
   const [addMembersModalOverlay, setAddMembersModalOverlay] = useState(true)
 
   const user = JSON.parse(localStorage.getItem("user"))
+  const baseURL =
+    process.env.NODE_ENV === "development"
+      ? process.env.REACT_APP_DEV_URL
+      : process.env.REACT_APP_PROD_URL
 
   const getChatData = async () => {
     setLoading(true)
@@ -58,6 +63,10 @@ const Chat = (props) => {
 
   useEffect(() => {
     getChatData()
+    const socket = openSocket(baseURL)
+    socket.on("join chatroom", (chatroom) => {
+      updateChatroomBySocket(chatroom)
+    })
   }, [])
 
   const fetchChatMessages = async (chatroomId) => {
@@ -217,6 +226,14 @@ const Chat = (props) => {
     })
   }
 
+  const updateChatroomBySocket = (chatroom) => {
+    setChatrooms((prevState) => {
+      const previousChatrooms = [...prevState]
+      previousChatrooms.push(chatroom)
+      return [...previousChatrooms]
+    })
+  }
+
   useEffect(() => {
     const selectedMembersCount = Object.keys(selectedMembers)
     setSelectedMembersNo(selectedMembersCount.length)
@@ -229,6 +246,8 @@ const Chat = (props) => {
   useEffect(() => {
     handleAddMembersModalOverlay()
   }, [addMembersLoading])
+
+  // useEffect(() => {}, [])
 
   const createGroupContent = (
     <form onSubmit={handleCreateGroup} className="general-form">

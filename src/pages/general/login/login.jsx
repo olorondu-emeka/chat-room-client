@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Link, useHistory } from "react-router-dom"
 import { Spinner } from "@chakra-ui/core"
 import axios from "../../../http"
+import openSocket from "socket.io-client"
 
 import "../register_login.css"
 
@@ -26,6 +27,13 @@ const Login = (props) => {
   const [errorMessage, setErrorMessage] = useState("")
   const [statusCode, setStatusCode] = useState(null)
 
+  const baseURL =
+    process.env.NODE_ENV === "development"
+      ? process.env.REACT_APP_DEV_URL
+      : process.env.REACT_APP_PROD_URL
+
+  const socketIO = openSocket(baseURL)
+
   const textChangeHandler = (event) => {
     const theName = event.target.name
     const theValue = event.target.value
@@ -49,6 +57,11 @@ const Login = (props) => {
       setErrorMessage("")
       localStorage.setItem("user", JSON.stringify(response))
       localStorage.setItem("token", response.token)
+
+      socketIO.on("connect", (socket) => {
+        socket.emit("userConnected", response.id)
+      })
+
       response.id && history.push("/chat")
     } catch (error) {
       const errorMessage = error.response.data.message ? error.response.data.message : "error"
