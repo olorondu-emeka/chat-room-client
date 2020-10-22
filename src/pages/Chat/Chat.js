@@ -14,12 +14,6 @@ const resetScroll = () => {
   window.scrollTo({ top: 0, behavior: "smooth" })
 }
 
-const baseURL =
-  process.env.NODE_ENV === "development"
-    ? process.env.REACT_APP_DEV_URL
-    : process.env.REACT_APP_PROD_URL
-const socketIO = openSocket(baseURL)
-
 const Chat = (props) => {
   const history = useHistory()
 
@@ -45,6 +39,7 @@ const Chat = (props) => {
   const [createGroupLoading, setCreateGroupLoading] = useState(false)
   const [addMembersLoading, setAddMembersLoading] = useState(false)
   const [selectedMembersNo, setSelectedMembersNo] = useState(0)
+  const [currentChatroomMessage, setCurrentChatroomMessage] = useState("")
 
   const user = JSON.parse(localStorage.getItem("user"))
 
@@ -78,6 +73,11 @@ const Chat = (props) => {
         updateChatroomBySocket(chatroom)
       }
     })
+
+    socketIO.on("chatroom message", ({ chatroomId, message }) => {
+      console.log("message received", chatroomId, message)
+      fetchChatMessagesBySocket(chatroomId, message)
+    })
   }, [])
 
   const fetchChatMessages = async (chatroomId) => {
@@ -93,6 +93,37 @@ const Chat = (props) => {
         })
       }
       setChatroomMessagesLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const fetchChatMessagesBySocket = (chatroomId, message) => {
+    setChatroomMessages((prevState) => {
+      let previousMessages = { ...prevState }
+      let previousChatroomMessages
+      if (!previousMessages[chatroomId]) {
+        previousChatroomMessages = []
+      } else {
+        previousChatroomMessages = [...previousMessages[chatroomId]]
+      }
+
+      previousChatroomMessages.push(message)
+      previousMessages[chatroomId] = previousChatroomMessages
+      return { ...previousMessages }
+    })
+  }
+
+  const handleMessageTyping = (event) => {
+    setCurrentChatroomMessage(event.target.value)
+  }
+
+  const sendChatroomMessage = async (event, chatroomId) => {
+    event.preventDefault()
+    try {
+      setCurrentChatroomMessage("")
+      await axios.post("/chatroom/message", { chatroomId, message: currentChatroomMessage })
+      console.log("message sent")
     } catch (error) {
       console.log(error)
     }
@@ -321,6 +352,10 @@ const Chat = (props) => {
           isAdmin={current.adminId === user.id}
           chatroomTitle={current.name}
           triggerAddMembers={triggerAddMembers}
+          sendChatroomMessage={sendChatroomMessage}
+          handleMessageTyping={handleMessageTyping}
+          chatroomId={current.id}
+          chatboxValue={currentChatroomMessage}
         />
       )}
       {!loading && current.id === undefined && (
