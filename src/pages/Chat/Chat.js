@@ -3,6 +3,7 @@ import { useHistory, Redirect } from "react-router-dom"
 import { Spinner, Stack } from "@chakra-ui/core"
 import axios from "../../http"
 import Modal from "../../components/UI/modal/modal"
+import openSocket from "socket.io-client"
 
 import ChatListing from "../../components/chat-listing/main/chatListing.jsx"
 import ChatBody from "../../components/single-chat/main/chatBody.jsx"
@@ -12,6 +13,12 @@ import "./Chat.css"
 const resetScroll = () => {
   window.scrollTo({ top: 0, behavior: "smooth" })
 }
+
+const baseURL =
+  process.env.NODE_ENV === "development"
+    ? process.env.REACT_APP_DEV_URL
+    : process.env.REACT_APP_PROD_URL
+const socketIO = openSocket(baseURL)
 
 const Chat = (props) => {
   const history = useHistory()
@@ -38,8 +45,6 @@ const Chat = (props) => {
   const [createGroupLoading, setCreateGroupLoading] = useState(false)
   const [addMembersLoading, setAddMembersLoading] = useState(false)
   const [selectedMembersNo, setSelectedMembersNo] = useState(0)
-  const [createGroupModalOverlay, setCreateGroupModalOverlay] = useState(true)
-  const [addMembersModalOverlay, setAddMembersModalOverlay] = useState(true)
 
   const user = JSON.parse(localStorage.getItem("user"))
 
@@ -48,7 +53,6 @@ const Chat = (props) => {
     try {
       const allChatrooms = await axios.get("/chatroom")
       setChatrooms(allChatrooms.chatrooms)
-      console.log("all chatrooms o", allChatrooms)
       setLoading(false)
     } catch (error) {
       setLoading(false)
@@ -58,6 +62,22 @@ const Chat = (props) => {
 
   useEffect(() => {
     getChatData()
+  }, [])
+
+  useEffect(() => {
+    const baseURL =
+      process.env.NODE_ENV === "development"
+        ? process.env.REACT_APP_DEV_URL
+        : process.env.REACT_APP_PROD_URL
+    const socketIO = openSocket(baseURL)
+
+    socketIO.on("join chatroom", ({ memberIdArray, chatroom }) => {
+      console.log("join chatroom")
+      if (memberIdArray.includes(user.id) && chatroom.adminId !== user.id) {
+        console.log("join chatroom triggered")
+        updateChatroomBySocket(chatroom)
+      }
+    })
   }, [])
 
   const fetchChatMessages = async (chatroomId) => {
@@ -83,29 +103,9 @@ const Chat = (props) => {
     await fetchChatMessages(chatroom.id)
   }
 
-  const closeOnOverlayClick = (modalState, setModalState) => {
-    console.log("overlay clicked!")
-    if (modalState) {
-      return false
-    }
-
-    setModalState(false)
-    return true
-  }
-
-  const handleCreateGroupModalOverlay = () => {
-    const modalState = closeOnOverlayClick(createGroupLoading, setCreateGroupModal)
-    setCreateGroupModalOverlay(modalState)
-  }
-
-  const handleAddMembersModalOverlay = () => {
-    const modalState = closeOnOverlayClick(addMembersLoading, setAddMembersModal)
-    setAddMembersModalOverlay(modalState)
-  }
-
   const triggerAddMembers = () => {
     console.log("add members triggered", addMembersModal)
-    setAddMembersModal((prevState) => !prevState)
+    setAddMembersModal(true)
   }
 
   const triggerCreateGroup = () => {
@@ -167,6 +167,7 @@ const Chat = (props) => {
         memberIdArray: membersArray, // an array of all ids of selected members
       }
       const response = await axios.post("/chatroom/add-members", requestBody)
+      console.log("handle add members")
       setAllMembers([])
       setAddMembersModal(false)
     } catch (error) {
@@ -217,18 +218,18 @@ const Chat = (props) => {
     })
   }
 
+  const updateChatroomBySocket = (chatroom) => {
+    setChatrooms((prevState) => {
+      const previousChatrooms = [...prevState]
+      previousChatrooms.push(chatroom)
+      return [...previousChatrooms]
+    })
+  }
+
   useEffect(() => {
     const selectedMembersCount = Object.keys(selectedMembers)
     setSelectedMembersNo(selectedMembersCount.length)
   }, [selectedMembers])
-
-  useEffect(() => {
-    handleCreateGroupModalOverlay()
-  }, [createGroupLoading])
-
-  useEffect(() => {
-    handleAddMembersModalOverlay()
-  }, [addMembersLoading])
 
   const createGroupContent = (
     <form onSubmit={handleCreateGroup} className="general-form">
@@ -280,7 +281,7 @@ const Chat = (props) => {
       )}
       {!addMembersLoading && allMembers.length > 0 && (
         <input
-          className={selectedMembersNo === 0 && "disabled"}
+          className={selectedMembersNo === 0 ? "disabled" : ""}
           type="submit"
           value="Submit"
           disabled={selectedMembersNo === 0}
@@ -292,7 +293,9 @@ const Chat = (props) => {
 
   useEffect(() => {
     console.log("get all members use effect hook")
-    getAllMembers()
+    if (addMembersModal) {
+      getAllMembers()
+    }
   }, [addMembersModal])
 
   return (
@@ -329,14 +332,8 @@ const Chat = (props) => {
         isOpen={createGroupModal}
         modalTitle="Create Chatroom"
         modalContent={createGroupContent}
-        closeOnOverlayClick={createGroupModalOverlay}
       />
-      <Modal
-        isOpen={addMembersModal}
-        modalTitle="Add Members"
-        modalContent={addMembersContent}
-        closeOnOverlayClick={addMembersModalOverlay}
-      />
+      <Modal isOpen={addMembersModal} modalTitle="Add Members" modalContent={addMembersContent} />
     </section>
   )
 }

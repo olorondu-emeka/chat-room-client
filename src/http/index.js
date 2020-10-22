@@ -2,8 +2,8 @@ import axios from "axios"
 
 const baseURL =
   process.env.NODE_ENV === "development"
-    ? process.env.REACT_APP_DEV_URL
-    : process.env.REACT_APP_PROD_URL
+    ? `${process.env.REACT_APP_DEV_URL}/api/v1`
+    : `${process.env.REACT_APP_PROD_URL}/api/v1`
 
 const http = axios.create({
   baseURL,

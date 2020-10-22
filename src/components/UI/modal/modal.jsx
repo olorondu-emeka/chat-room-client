@@ -12,7 +12,7 @@ import {
 
 import "./modal.css"
 
-const MyModal = ({ isOpen, modalTitle, modalContent, closeOnOverlayClick }) => {
+const MyModal = ({ isOpen, modalTitle, modalContent }) => {
   const { onOpen, onClose } = useDisclosure()
   return (
     <div className="my-modal">

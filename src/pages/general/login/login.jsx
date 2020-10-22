@@ -49,6 +49,11 @@ const Login = (props) => {
       setErrorMessage("")
       localStorage.setItem("user", JSON.stringify(response))
       localStorage.setItem("token", response.token)
+
+      // socketIO.on("connect", (socket) => {
+      //   socket.emit("userConnected", response.id)
+      // })
+
       response.id && history.push("/chat")
     } catch (error) {
       const errorMessage = error.response.data.message ? error.response.data.message : "error"

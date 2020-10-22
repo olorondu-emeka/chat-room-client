@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import { Link, useHistory } from "react-router-dom"
 import { Spinner } from "@chakra-ui/core"
 import axios from "../../../http"
+import openSocket from "socket.io-client"
 
 import "../register_login.css"
 
@@ -48,6 +49,11 @@ const Register = (props) => {
       setErrorMessage("")
       localStorage.setItem("user", JSON.stringify(response))
       localStorage.setItem("token", response.token)
+
+      // socketIO.on("connect", (socket) => {
+      //   socket.emit("userConnected", response.id)
+      // })
+
       response.id && history.push("/chat")
     } catch (error) {
       const errorMessage = error.response.data.message ? error.response.data.message : "error"
