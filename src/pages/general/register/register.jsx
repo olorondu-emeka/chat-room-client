@@ -27,13 +27,6 @@ const Register = (props) => {
   const [errorMessage, setErrorMessage] = useState("")
   const [statusCode, setStatusCode] = useState(null)
 
-  const baseURL =
-    process.env.NODE_ENV === "development"
-      ? process.env.REACT_APP_DEV_URL
-      : process.env.REACT_APP_PROD_URL
-
-  const socketIO = openSocket(baseURL)
-
   const textChangeHandler = (event) => {
     const theName = event.target.name
     const theValue = event.target.value
@@ -57,9 +50,9 @@ const Register = (props) => {
       localStorage.setItem("user", JSON.stringify(response))
       localStorage.setItem("token", response.token)
 
-      socketIO.on("connect", (socket) => {
-        socket.emit("userConnected", response.id)
-      })
+      // socketIO.on("connect", (socket) => {
+      //   socket.emit("userConnected", response.id)
+      // })
 
       response.id && history.push("/chat")
     } catch (error) {
