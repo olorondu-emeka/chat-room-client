@@ -9,7 +9,7 @@ const MessageContainer = ({ messages }) => {
   console.log("messages", messages)
   const messageArray = messages.map((message) => {
     console.log("message", message)
-    if (!message.User.id) return null
+    if (message.User === null) return null
     const type = message.User.id === user.id ? "sender" : "recipient"
     return (
       <ChatMessage
