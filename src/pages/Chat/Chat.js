@@ -73,6 +73,7 @@ const Chat = (props) => {
     })
 
     socketIO.on("chatroom message", ({ chatroomId, message }) => {
+      console.log("message event", message)
       fetchChatMessagesBySocket(chatroomId, message)
     })
   }, [])

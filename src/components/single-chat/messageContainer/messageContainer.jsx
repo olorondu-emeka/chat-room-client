@@ -6,6 +6,7 @@ import "./messageContainer.css"
 const user = JSON.parse(localStorage.getItem("user"))
 
 const MessageContainer = ({ messages }) => {
+  console.log("messages", messages)
   const messageArray = messages.map((message) => {
     const type = message.User.id === user.id ? "sender" : "recipient"
     return (
