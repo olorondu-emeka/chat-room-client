@@ -67,15 +67,12 @@ const Chat = (props) => {
     const socketIO = openSocket(baseURL)
 
     socketIO.on("join chatroom", ({ memberIdArray, chatroom }) => {
-      console.log("join chatroom")
       if (memberIdArray.includes(user.id) && chatroom.adminId !== user.id) {
-        console.log("join chatroom triggered")
         updateChatroomBySocket(chatroom)
       }
     })
 
     socketIO.on("chatroom message", ({ chatroomId, message }) => {
-      console.log("message received", chatroomId, message)
       fetchChatMessagesBySocket(chatroomId, message)
     })
   }, [])
@@ -99,14 +96,13 @@ const Chat = (props) => {
   }
 
   const fetchChatMessagesBySocket = (chatroomId, message) => {
+    // note: ALWAYS update state immutably
     setChatroomMessages((prevState) => {
+      // immutable object copy
       let previousMessages = { ...prevState }
-      let previousChatroomMessages
-      if (!previousMessages[chatroomId]) {
-        previousChatroomMessages = []
-      } else {
-        previousChatroomMessages = [...previousMessages[chatroomId]]
-      }
+
+      // immutable array copy
+      let previousChatroomMessages = [...previousMessages[chatroomId]]
 
       previousChatroomMessages.push(message)
       previousMessages[chatroomId] = previousChatroomMessages
@@ -123,7 +119,6 @@ const Chat = (props) => {
     try {
       setCurrentChatroomMessage("")
       await axios.post("/chatroom/message", { chatroomId, message: currentChatroomMessage })
-      console.log("message sent")
     } catch (error) {
       console.log(error)
     }
@@ -135,7 +130,6 @@ const Chat = (props) => {
   }
 
   const triggerAddMembers = () => {
-    console.log("add members triggered", addMembersModal)
     setAddMembersModal(true)
   }
 
@@ -198,7 +192,6 @@ const Chat = (props) => {
         memberIdArray: membersArray, // an array of all ids of selected members
       }
       const response = await axios.post("/chatroom/add-members", requestBody)
-      console.log("handle add members")
       setAllMembers([])
       setAddMembersModal(false)
     } catch (error) {
@@ -208,7 +201,6 @@ const Chat = (props) => {
   }
 
   const getAllMembers = async () => {
-    console.log("get all members o")
     if (addMembersModal) {
       try {
         setAddMembersLoading(true)
@@ -224,14 +216,12 @@ const Chat = (props) => {
         })
         setAddMembersLoading(false)
       } catch (error) {
-        console.log("get all members loading")
         setAddMembersLoading(false)
       }
     }
   }
 
   const handleMemberSelect = (event) => {
-    console.log(event.target.value, event.target.checked)
     const checked = event.target.checked
     const value = event.target.value
 
@@ -296,7 +286,7 @@ const Chat = (props) => {
       {!addMembersLoading && (
         <Stack spacing={3}>
           {allMembers.map((member) => (
-            <div className="checkbox-group">
+            <div className="checkbox-group" key={member.id}>
               <input
                 type="checkbox"
                 onChange={handleMemberSelect}
@@ -323,7 +313,6 @@ const Chat = (props) => {
   )
 
   useEffect(() => {
-    console.log("get all members use effect hook")
     if (addMembersModal) {
       getAllMembers()
     }

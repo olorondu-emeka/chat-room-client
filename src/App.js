@@ -8,13 +8,6 @@ import socketIO from "./socket"
 import "./App.css"
 
 const App = () => {
-  // const io = socketIO.init(baseURL)
-  // useEffect(() => {
-  //   // io.on("connection", () => {
-  //   //   console.log("e don connect")
-  //   // })
-  // }, [])
-
   return (
     <BrowserRouter>
       <Switch>
