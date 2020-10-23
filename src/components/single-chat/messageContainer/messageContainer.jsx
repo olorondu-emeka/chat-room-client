@@ -3,9 +3,9 @@ import ChatMessage from "../chatMessage/chatMessage"
 
 import "./messageContainer.css"
 
-const user = JSON.parse(localStorage.getItem("user"))
-
 const MessageContainer = ({ messages }) => {
+  const user = JSON.parse(localStorage.getItem("user"))
+  console.log("user", user)
   console.log("messages", messages)
   let messageArray = []
 
