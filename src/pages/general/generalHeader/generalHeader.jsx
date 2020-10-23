@@ -5,7 +5,6 @@ import { NavLink, Link } from "react-router-dom"
 
 const General_Header = React.memo((props) => {
   let theClass = `nav ${props.extraClass}`
-  console.log(props.extraClass)
 
   return (
     <header id="general_header" className={theClass}>
