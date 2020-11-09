@@ -72,10 +72,32 @@ const Chat = (props) => {
       }
     })
 
-    socketIO.on("chatroom message", ({ chatroomId, message }) => {
-      console.log("message event", message)
+    socketIO.on("chatroom message", async ({ chatroomId, message }) => {
       fetchChatMessagesBySocket(chatroomId, message)
+
+      const response = await axios.patch(`/chatroom/${chatroomId}/checkpoint`, {
+        messageId: message.id,
+      })
+
+      console.log("checkpoint response", response)
+
+      // const messageArray = chatroomMessages[chatroomId]
+      // if (messageArray.length > 0) {
+      //   const lastMessage = messageArray[messageArray.length - 1]
+
+      // }
     })
+
+    socketIO.on("cached messages", ({ userId, chatroomId, messages }) => {
+      if (userId === user.id) {
+        fetchCachedMessagesBySocket(chatroomId, messages)
+      }
+    })
+
+    return function cleanup() {
+      socketIO.off("chatroom message")
+      socketIO.off("cached messages")
+    }
   }, [])
 
   const fetchChatMessages = async (chatroomId) => {
@@ -84,9 +106,19 @@ const Chat = (props) => {
       if (!chatroomMessages[chatroomId]) {
         const response = await axios.get(`/chatroom/message/${chatroomId}`)
         setChatroomMessages((prevState) => {
+          let previousState = { ...prevState }
+          let newMessages
+
+          if (!previousState[chatroomId]) {
+            newMessages = [...response.messages]
+          } else {
+            newMessages = [...previousState[chatroomId], ...response.messages]
+          }
+
+          previousState[chatroomId] = newMessages
+
           return {
-            ...prevState,
-            [chatroomId]: response.messages,
+            ...previousState,
           }
         })
       }
@@ -109,6 +141,28 @@ const Chat = (props) => {
       previousMessages[chatroomId] = previousChatroomMessages
       return { ...previousMessages }
     })
+  }
+
+  const fetchCachedMessagesBySocket = (chatroomId, messageArray) => {
+    // note: ALWAYS update state immutably
+    setChatroomMessages((prevState) => {
+      // immutable object copy
+      let previousMessages = { ...prevState }
+
+      // immutable array copy
+      console.log("prev chat", previousMessages, chatroomId)
+      let previousChatroomMessages
+      if (!previousMessages[chatroomId]) {
+        previousChatroomMessages = [...messageArray]
+      } else {
+        previousChatroomMessages = [...previousMessages[chatroomId], ...messageArray]
+      }
+
+      previousMessages[chatroomId] = previousChatroomMessages
+      return { ...previousMessages }
+    })
+
+    if (chatroomMessagesLoading) setChatroomMessagesLoading(false)
   }
 
   const handleMessageTyping = (event) => {
