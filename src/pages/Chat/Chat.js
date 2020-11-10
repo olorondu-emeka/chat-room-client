@@ -14,6 +14,8 @@ const resetScroll = () => {
   window.scrollTo({ top: 0, behavior: "smooth" })
 }
 
+let currentChatroom = {}
+
 const Chat = (props) => {
   const history = useHistory()
 
@@ -60,6 +62,11 @@ const Chat = (props) => {
   }, [])
 
   useEffect(() => {
+    if (current.id) {
+    }
+  }, [current])
+
+  useEffect(() => {
     const baseURL =
       process.env.NODE_ENV === "development"
         ? process.env.REACT_APP_DEV_URL
@@ -73,24 +80,20 @@ const Chat = (props) => {
     })
 
     socketIO.on("chatroom message", async ({ chatroomId, message }) => {
-      fetchChatMessagesBySocket(chatroomId, message)
-
-      const response = await axios.patch(`/chatroom/${chatroomId}/checkpoint`, {
-        messageId: message.id,
-      })
-
-      console.log("checkpoint response", response)
-
-      // const messageArray = chatroomMessages[chatroomId]
-      // if (messageArray.length > 0) {
-      //   const lastMessage = messageArray[messageArray.length - 1]
-
-      // }
+      if (currentChatroom.id === chatroomId) {
+        fetchChatMessagesBySocket(chatroomId, message)
+        const response = await axios.patch(`/chatroom/${chatroomId}/checkpoint`, {
+          message,
+        })
+        console.log("message received")
+        // socketIO.emit("message received", { userId: user.id, chatroomId, message })
+      }
     })
 
     socketIO.on("cached messages", ({ userId, chatroomId, messages }) => {
       if (userId === user.id) {
         fetchCachedMessagesBySocket(chatroomId, messages)
+        console.log("cached messages", messages)
       }
     })
 
@@ -105,6 +108,7 @@ const Chat = (props) => {
       setChatroomMessagesLoading(true)
       if (!chatroomMessages[chatroomId]) {
         const response = await axios.get(`/chatroom/message/${chatroomId}`)
+        console.log("message fetched", response.messages)
         setChatroomMessages((prevState) => {
           let previousState = { ...prevState }
           let newMessages
@@ -130,14 +134,21 @@ const Chat = (props) => {
 
   const fetchChatMessagesBySocket = (chatroomId, message) => {
     // note: ALWAYS update state immutably
+    let currentChatroom = current
     setChatroomMessages((prevState) => {
       // immutable object copy
+      console.log("current o", currentChatroom, chatroomId)
+
       let previousMessages = { ...prevState }
 
       // immutable array copy
-      let previousChatroomMessages = [...previousMessages[chatroomId]]
+      let previousChatroomMessages
+      if (!previousMessages[chatroomId]) {
+        previousChatroomMessages = [message]
+      } else {
+        previousChatroomMessages = [...previousMessages[chatroomId], message]
+      }
 
-      previousChatroomMessages.push(message)
       previousMessages[chatroomId] = previousChatroomMessages
       return { ...previousMessages }
     })
@@ -150,7 +161,6 @@ const Chat = (props) => {
       let previousMessages = { ...prevState }
 
       // immutable array copy
-      console.log("prev chat", previousMessages, chatroomId)
       let previousChatroomMessages
       if (!previousMessages[chatroomId]) {
         previousChatroomMessages = [...messageArray]
@@ -180,7 +190,9 @@ const Chat = (props) => {
   }
 
   const setCurrentChatroom = async (chatroom) => {
+    setChatroomMessagesLoading(true)
     setCurrent(chatroom)
+    currentChatroom = chatroom
     await fetchChatMessages(chatroom.id)
   }
 
