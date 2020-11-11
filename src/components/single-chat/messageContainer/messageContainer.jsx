@@ -5,13 +5,11 @@ import "./messageContainer.css"
 
 const MessageContainer = ({ messages }) => {
   const user = JSON.parse(localStorage.getItem("user"))
-  console.log("user", user)
-  console.log("messages", messages)
+
   let messageArray = []
 
   if (messages.length > 0) {
     messageArray = messages.map((message) => {
-      console.log("message", message)
       if (message.User === null) return null
       const type = message.User.id === user.id ? "sender" : "recipient"
       return (
